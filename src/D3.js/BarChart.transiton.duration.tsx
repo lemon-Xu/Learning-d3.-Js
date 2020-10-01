@@ -12,6 +12,8 @@ const BarChart: React.FC = () => {
       { name: "Cai Yun", value: 16 },
       { name: "Liang Yuan", value: 25 },
       { name: "Yuan-Chen", value: 6 },
+      { name: "Lemon", value: 6 },
+      { name: "Xu", value: 6 },
     ];
 
     const data2 = [
@@ -100,13 +102,17 @@ const BarChart: React.FC = () => {
     //   .attr("width", (d) => xScale(d.value) || 0);
 
     let timer = window.setTimeout(() => {
-      d3.selectAll(".dataRect")
-        .data(data2, (d: any) => {
-          return d.name;
-        })
+      let updateSelection = d3.selectAll(".dataRect").data(data2, (d: any) => {
+        return d.name;
+      });
+
+      updateSelection
         .transition()
         .duration(5000)
         .attr("width", (d) => xScale(d.value) || 0);
+
+      updateSelection.exit().transition().duration(5000).attr("opacity", 0.3);
+
       clearTimeout(timer);
     }, 5000);
   });
