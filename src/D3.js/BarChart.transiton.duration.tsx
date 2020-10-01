@@ -14,6 +14,14 @@ const BarChart: React.FC = () => {
       { name: "Yuan-Chen", value: 6 },
     ];
 
+    const data2 = [
+      { name: "Cai Yun", value: 6 },
+      { name: "Liang Yuan", value: 6 },
+      { name: "Yuan-Chen", value: 6 },
+      { name: "Shao-Kui", value: 25 },
+      { name: "Wen-Yang", value: 16 },
+    ];
+
     const svg = d3
       .select(svgRef.current) // 选择dom节点， 可以是'#id' \ '.class' \ 真实dom节点
       .attr("width", 1600)
@@ -28,6 +36,7 @@ const BarChart: React.FC = () => {
     let max = d3.max(data, (d) => d.value);
     const MAX = max !== undefined ? max : 0;
 
+    // Scale
     const xScale = d3.scaleLinear().domain([0, MAX]).range([0, innerWidth]);
     const yScale = d3
       .scaleBand()
@@ -48,18 +57,32 @@ const BarChart: React.FC = () => {
 
     // 以上是定义坐标轴
 
-    // 以下是绘制条带
-    data.forEach((d) => {
-      let width = xScale(d.value);
-      let y = yScale(d.name);
-      if (!width) width = 0;
-      if (!y) y = 0;
-      g.append("rect")
-        .attr("width", width)
-        .attr("height", yScale.bandwidth())
-        .attr("fill", "green")
-        .attr("y", y);
-    });
+    // 以下是绘制条带, 使用添加
+    // data.forEach((d) => {
+    //   let width = xScale(d.value);
+    //   let y = yScale(d.name);
+    //   if (!width) width = 0;
+    //   if (!y) y = 0;
+    //   g.append("rect")
+    //     .attr("width", width)
+    //     .attr("height", yScale.bandwidth())
+    //     .attr("fill", "green")
+    //     .attr("y", y);
+    // });
+
+    // draw rectangles
+    g.selectAll(".dataRect")
+      .data(data)
+      .enter()
+      .append("rect")
+      .transition()
+      .duration(1000)
+      .attr("class", "dataRect")
+      .attr("width", (d) => xScale(d.value) || 0)
+      .attr("height", yScale.bandwidth())
+      .attr("y", (d) => yScale(d.name) || 0)
+      .attr("fill", "green")
+      .attr("opacity", 0.8);
 
     // 自由修改坐标轴刻度 里 text 中的字体大小
     d3.selectAll(".tick text").attr("font-size", "1.2em");
@@ -70,6 +93,22 @@ const BarChart: React.FC = () => {
       .attr("font-size", "3em")
       .attr("transform", `translate(${innerWidth / 2},0)`)
       .attr("text-anchor", "middle");
+
+    // 数据绑定到图元， 出现问题， 索引错误
+    // d3.selectAll("rect")
+    //   .data(data2)
+    //   .attr("width", (d) => xScale(d.value) || 0);
+
+    let timer = window.setTimeout(() => {
+      d3.selectAll(".dataRect")
+        .data(data2, (d: any) => {
+          return d.name;
+        })
+        .transition()
+        .duration(5000)
+        .attr("width", (d) => xScale(d.value) || 0);
+      clearTimeout(timer);
+    }, 5000);
   });
 
   return (
