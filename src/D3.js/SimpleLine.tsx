@@ -65,7 +65,7 @@ const SimpleLine: React.FC = () => {
         .nice();
       yScale = d3
         .scaleLinear()
-        .domain([minY, maxY])
+        .domain([maxY, minY])
         .range([0, innerHeight])
         .nice();
 
@@ -84,7 +84,6 @@ const SimpleLine: React.FC = () => {
         .attr("transform", `translate(0, ${innerHeight})`);
 
       const yAxisGroup = g.append("g").call(yAxis);
-      // .attr("transform", `translate(0, ${-innerWidth})`);
 
       g.selectAll(".tick text").attr("font-size", "1em");
       g.append("path").attr("id", "alterPath");
@@ -108,34 +107,38 @@ const SimpleLine: React.FC = () => {
           return xScale(xValue(d)) || 0;
         })
         .y((d: IData) => {
-          return yScale(0) || 0;
-        });
+          return yScale(d3.min(data, yValue) || 0) || 0;
+        })
+        .curve(d3.curveCardinal.tension(0.5));
 
       // .curve(d3.curveCardinal.tension(0.5));
 
       const maingroup = d3.select("#maingroup");
-      maingroup
+      // maingroup
+      //   .append("path")
+      //   .attr("d", line(data) || "")
+      //   .attr("stroke", "black")
+      //   .attr("fill", "none");
+      const pathUpdate = maingroup.selectAll(".datacurve").data(data);
+
+      const pathEnter = pathUpdate
+        .enter()
         .append("path")
-        .attr("d", line(data) || "")
-        .attr("stroke", "black")
-        .attr("fill", "none");
-      //   const pathUpdate = maingroup.selectAll(".datacurve").data([data]);
+        .attr("class", "datacurve")
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 2.5)
+        .attr("d", line(data) || "");
 
-      //   const pathenter = pathUpdate
-      //     .enter()
-      //     .append("path")
-      //     .attr("class", "datacurve")
-      //     .attr("fill", "none")
-      //     .attr("stroke", "steelblue")
-      //     .attr("stroke-width", 2.5)
-      //     .attr("d", lineEmpty(data));
+      pathUpdate
+        .merge(d3.selectAll(".datacurve"))
+        .transition()
+        .duration(2000)
+        .ease(d3.easeLinear)
+        .attr("d", lineEmpty(data) || "");
 
-      //   pathUpdate
-      //     .merge(pathenter)
-      //     .transition()
-      //     .duration(2000)
-      //     .ease(d3.easeLinear)
-      //     .attr("d", line);
+      console.log(line(data));
+      console.log(lineEmpty(data));
     };
 
     init(data);

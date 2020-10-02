@@ -89,14 +89,14 @@ const LineChart: React.FC = () => {
       const maingroup = d3.select("#maingroup");
       const pathUpdate = maingroup.selectAll(".datacurve").data([data]);
 
-      // const pathEnter = maingroup
-      //   .enter()
-      //   .append("path")
-      //   .attr("class", "datacurve")
-      //   .attr("fill", "none")
-      //   .attr("stroke", "steelblue")
-      //   .attr("stroke-width", 2.5)
-      //   .attr("d", lineEmpty);
+      const pathEnter = maingroup
+        .enter()
+        .append("path")
+        .attr("class", "datacurve")
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 2.5)
+        .attr("d", lineEmpty(data) || 0);
 
       // pathUpdate
       //   .merge(pathEnter)
