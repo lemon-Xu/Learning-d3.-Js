@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { keys } from "d3";
 
-const LineChart: React.FC = () => {
-  const svgRef = useRef<SVGSVGElement>(null);
+const LineChart = () => {
+  const svgRef = useRef(null);
   useEffect(() => {
     const svg = svgRef.current;
     const selection = d3.select(svg);
@@ -18,18 +19,18 @@ const LineChart: React.FC = () => {
       .attr("id", "maingroup")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    const xValue = (datum: any): Date => {
+    const xValue = (datum) => {
       return datum["日期"];
     };
-    const yValue = (datum: any): number => {
+    const yValue = (datum) => {
       return datum["现有确诊"];
     };
 
-    let xScale: any, yScale: any;
-    let alldates: any;
-    let allkeys: any;
+    let xScale, yScale;
+    let alldates;
+    let allkeys;
 
-    const render_init = (data: any) => {
+    const render_init = (data) => {
       let minX = d3.min(data, xValue) || 0;
       let maxX = d3.max(data, xValue) || 0;
 
@@ -49,6 +50,7 @@ const LineChart: React.FC = () => {
         .nice();
 
       // Adding axes
+      console.log(alldates);
       const xAxis = d3
         .axisBottom(xScale)
         .ticks(Math.floor(alldates.length / 4))
@@ -69,7 +71,7 @@ const LineChart: React.FC = () => {
       g.append("path").attr("id", "alterPath");
     };
 
-    const renderUpdate = (data: any) => {
+    const renderUpdate = (data) => {
       const line = d3
         .line()
         .x((d) => xScale(xValue(d)))
@@ -83,36 +85,33 @@ const LineChart: React.FC = () => {
         .y((d) => yScale(0))
         .curve(d3.curveCardinal.tension(0.5));
 
-      console.log(line);
-      console.log(lineEmpty);
-
       const maingroup = d3.select("#maingroup");
       const pathUpdate = maingroup.selectAll(".datacurve").data([data]);
 
-      // const pathEnter = maingroup
-      //   .enter()
-      //   .append("path")
-      //   .attr("class", "datacurve")
-      //   .attr("fill", "none")
-      //   .attr("stroke", "steelblue")
-      //   .attr("stroke-width", 2.5)
-      //   .attr("d", lineEmpty);
+      const pathEnter = maingroup
+        .enter()
+        .append("path")
+        .attr("class", "datacurve")
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 2.5)
+        .attr("d", lineEmpty);
 
-      // pathUpdate
-      //   .merge(pathEnter)
-      //   .transition()
-      //   .duration(2000)
-      //   .ease(d3.easeLinear)
-      //   .attr("d", line);
+      pathUpdate
+        .merge(pathEnter)
+        .transition()
+        .duration(2000)
+        .ease(d3.easeLinear)
+        .attr("d", line);
     };
 
-    const renderUpdateAlter = (data: any) => {
+    const renderUpdateAlter = (data) => {
       const line = d3
         .line()
-        .x((d: any) => {
+        .x((d) => {
           return xScale(xValue(d));
         })
-        .y((d: any) => {
+        .y((d) => {
           return yScale(yValue(d));
         })
         .curve(d3.curveCardinal.tension(0.5)); // 如何进行闭合，如何进行差值
@@ -127,41 +126,41 @@ const LineChart: React.FC = () => {
         .attr("d", line);
     };
 
-    d3.csv("./svc/hubei_day14.csv").then((data: any) => {
-      data = data.filter((d: any) => d["地区"] !== "总计");
-      data = data.filter((d: any) => d["地区"] !== "湖北");
-      data.forEach((datum: any) => {
+    d3.csv("./svc/hubei_day14.csv").then((data) => {
+      data = data.filter((d) => d["地区"] !== "总计");
+      data = data.filter((d) => d["地区"] !== "湖北");
+      data.forEach((datum) => {
         datum["现有确诊"] = +datum["现有确诊"];
         datum["日期"] = new Date(datum["日期"]);
       });
 
-      let provinces: any = {};
+      let provinces = {};
 
-      allkeys = Array.from(new Set(data.map((d: any) => d["地区"])));
-      alldates = Array.from(new Set(data.map((d: any) => d["日期"])));
-      allkeys.forEach((key: any) => {
+      allkeys = Array.from(new Set(data.map((d) => d["地区"])));
+      alldates = Array.from(new Set(data.map((d) => d["日期"])));
+      allkeys.forEach((key) => {
         provinces[key] = [];
       });
 
-      data.forEach((d: any) => {
+      data.forEach((d) => {
         provinces[d["地区"]].push(d);
       });
 
-      allkeys.forEach((key: any) => {
-        provinces[key] = provinces[key].sort((a: any, b: any) => {
+      allkeys.forEach((key) => {
+        provinces[key] = provinces[key].sort((a, b) => {
           return a["日期"] - b["日期"];
         });
       });
-
-      render_init(data);
-      renderUpdate(data);
+      console.log(data);
+      console.log(allkeys);
+      render_init(data, allkeys);
       let c = 0;
       let intervalId = setInterval(() => {
         if (c >= allkeys.length) {
           clearInterval(intervalId);
         } else {
           let key = allkeys[c];
-          // renderUpdateAlter(provinces[key]);
+          renderUpdateAlter(provinces[key]);
           c = c + 1;
         }
       }, 2000);
