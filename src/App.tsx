@@ -1,14 +1,15 @@
 import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 
 // import { BarChart } from "./D3.js/BarChart";
 // import { BarChart } from "./D3.js/BarChart.Data-Join";
-import { BarChart } from "./D3.js/BarChart.transiton.duration";
+// import { BarChart } from "./D3.js/BarChart.transiton.duration";
+// import { BubbleDiagram } from "./D3.js/BubbleDiagram";
+import { LineChart } from "./D3.js/LineChart";
 function App() {
   return (
     <>
-      <BarChart></BarChart>
+      <LineChart></LineChart>
     </>
   );
 }

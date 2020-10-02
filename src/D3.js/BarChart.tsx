@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { NumberValue } from "d3";
 
 const BarChart: React.FC = () => {
   const svgRef = useRef<SVGSVGElement>(null);
