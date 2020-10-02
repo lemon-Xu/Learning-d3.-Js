@@ -72,9 +72,10 @@ const SimpleLine: React.FC = () => {
       datesKeys = Array.from(new Set(data.map((d) => d.date)));
 
       // Adding axes
-      const xAxis = d3.axisBottom(xScale);
-      // .ticks(Math.floor(datesKeys.length / 4))
-      // .tickSize(-innerHeight);
+      const xAxis = d3
+        .axisBottom(xScale)
+        .tickValues(Array.from(new Set(data.map((e) => e.date))))
+        .tickSize(-innerHeight);
 
       const yAxis = d3.axisLeft(yScale).tickSize(-innerWidth);
 
