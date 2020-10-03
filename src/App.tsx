@@ -6,11 +6,13 @@ import "./App.css";
 // import { BarChart } from "./D3.js/BarChart.transiton.duration";
 // import { BubbleDiagram } from "./D3.js/BubbleDiagram";
 // import { LineChart } from "./D3.js/LineChart";
-import { SimpleLine } from "./D3.js/SimpleLine";
+// import { SimpleLine } from "./D3.js/SimpleLine";
+import { InteractionMap } from "./D3.js/Interaction.Map";
+
 function App() {
   return (
     <>
-      <SimpleLine></SimpleLine>
+      <InteractionMap></InteractionMap>
     </>
   );
 }
