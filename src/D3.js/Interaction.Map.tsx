@@ -1,8 +1,14 @@
 import React, { useRef, useEffect, useState } from "react";
-import * as d3 from "d3";
+
 import * as topojson from "topojson";
 import { GeoJsonProperties, Feature } from "geojson";
+
+import * as d3 from "d3";
 import { svg } from "d3";
+import "d3-tip";
+import "../CSS/earth.css";
+
+import "d3-tip";
 
 const InteractionMap: React.FC = () => {
   const ref = useRef<SVGSVGElement>(null);
@@ -23,33 +29,47 @@ const InteractionMap: React.FC = () => {
     const g = svgSelection
       .append("g")
       .attr("id", "mainGroup")
-      .attr("transform", `trnaslate(${margin.left},${margin.right})`);
+      .attr("transform", `translate(${margin.left},${margin.right})`);
 
     const projection = d3.geoNaturalEarth1();
 
     const geo = d3.geoPath().projection(projection);
 
-    const init = (data: any) => {};
+    // let tip: any = d3
+    //   .tip()
+    //   .attr("class", "d3-tip")
+    //   .html((d: any) => d.properties.name);
+    // svgSelection.call(tip);
 
     d3.json("./topoJson/countries-110m.json").then((data: any) => {
       let worldMeta: GeoJsonProperties = topojson.feature<GeoJsonProperties>(
         data,
         data.objects.countries
       );
-      console.log(worldMeta);
-      for (let a in worldMeta) {
-        console.log(a);
-      }
 
-      console.log(geo(worldMeta.features));
-      console.log(worldMeta.features);
+      projection.fitSize([innerWidth, innerHeight], worldMeta as any);
+
       g.selectAll("path")
         .data(worldMeta.features)
         .enter()
         .append("path")
         .attr("stroke", "black")
         .attr("stroke-width", 1)
-        .attr("d", (d: any) => geo(d));
+        .attr("d", (data: any) => geo(data))
+        .on("mouseover", function (d) {
+          d3.select(this)
+            .attr("opacity", 0.5)
+            .attr("stroke", "white")
+            .attr("stroke-width", 6);
+
+          //   tip.show(d);
+        })
+        .on("mouseout", function (d) {
+          d3.select(this)
+            .attr("opacity", 1)
+            .attr("stroke", "black")
+            .attr("stroke-width", 1);
+        });
     });
   });
 

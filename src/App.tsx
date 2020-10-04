@@ -7,12 +7,12 @@ import "./App.css";
 // import { BubbleDiagram } from "./D3.js/BubbleDiagram";
 // import { LineChart } from "./D3.js/LineChart";
 // import { SimpleLine } from "./D3.js/SimpleLine";
-import { InteractionMap } from "./D3.js/Interaction.Map";
-
+// import { InteractionMap } from "./D3.js/Interaction.Map";
+import { StackBarChart } from "./D3.js/StackBarChart.Simple";
 function App() {
   return (
     <>
-      <InteractionMap></InteractionMap>
+      <StackBarChart></StackBarChart>
     </>
   );
 }
