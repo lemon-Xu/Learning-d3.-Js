@@ -8,7 +8,7 @@ interface IGamesDatum {
 
 interface IDatum {
   name: string;
-  children: IDatum | IGamesDatum[];
+  children: this | IGamesDatum[];
 }
 
 const Tree: React.FC = () => {
@@ -26,7 +26,7 @@ const Tree: React.FC = () => {
   const svg = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    let root: d3.HierarchyNode<IDatum>;
+    let root: d3.HierarchyPointNode<IDatum>;
     const svgSelection = d3.select(svg.current);
     svgSelection.attr("width", width).attr("height", height);
 
@@ -60,11 +60,11 @@ const Tree: React.FC = () => {
           "d",
           d3
             .linkHorizontal<
-              d3.HierarchyLink<IDatum>,
-              d3.HierarchyNode<IGamesDatum>
+              d3.HierarchyPointLink<IDatum>,
+              d3.HierarchyPointNode<IDatum>
             >()
-            .x((d: any) => d.y)
-            .y((d: any) => d.x)
+            .x((d: d3.HierarchyPointNode<IDatum>) => d.y)
+            .y((d: d3.HierarchyPointNode<IDatum>) => d.x)
         )
         .text("1");
 
@@ -89,8 +89,12 @@ const Tree: React.FC = () => {
 
     d3.json<IDatum>("./data/games.json").then((data: IDatum | undefined) => {
       if (data) {
-        root = d3.hierarchy<IDatum>(data);
-        d3.tree().size([innerHeight, innerWidth])(root);
+        let dataHierarchyNode: d3.HierarchyNode<IDatum> = d3.hierarchy<IDatum>(
+          data
+        );
+        root = d3.tree<IDatum>().size([innerHeight, innerWidth])(
+          dataHierarchyNode
+        );
         render(root);
       }
     });

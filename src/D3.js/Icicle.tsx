@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import * as d3 from "d3";
+import { HierarchyNode } from "d3";
+import { isDate } from "moment";
 
 interface IGamesDatum {
   name: string;
@@ -8,7 +10,13 @@ interface IGamesDatum {
 
 interface IDatum {
   name: string;
-  children: IGamesDatum[];
+  children: this[] | IGamesDatum[];
+}
+
+interface IDatumSum {
+  name: string;
+  children: this | IGamesDatum[];
+  popularity: number;
 }
 
 const Icicle: React.FC = () => {
@@ -26,7 +34,7 @@ const Icicle: React.FC = () => {
   const svg = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    let root: d3.HierarchyNode<IDatum>;
+    let root: d3.HierarchyRectangularNode<IDatum>;
     const svgSelection = d3.select(svg.current);
     svgSelection.attr("width", width).attr("height", height);
 
@@ -40,41 +48,66 @@ const Icicle: React.FC = () => {
       return color(d.data.name);
     };
 
-    const render = (data: any) => {
+    const render = (data: d3.HierarchyRectangularNode<IDatum>) => {
       color = d3.scaleOrdinal(d3.schemeCategory10);
 
       g.selectAll(".datarect")
         .data(root.descendants())
         .join("rect")
         .attr("class", "datarect")
-        .attr("x", (d: any) => d.y0 / 2)
-        .attr("y", (d: any) => d.x0 / 4)
-        .attr("height", (d: any) => (d.x1 - d.x0) / 4)
-        .attr("width", (d: any) => (d.y1 - d.y0) / 2)
+        .attr("x", (d: d3.HierarchyRectangularNode<IDatum>) => d.y0 / 2)
+        .attr("y", (d: d3.HierarchyRectangularNode<IDatum>) => d.x0 / 4)
+        .attr(
+          "height",
+          (d: d3.HierarchyRectangularNode<IDatum>) => (d.x1 - d.x0) / 4
+        )
+        .attr(
+          "width",
+          (d: d3.HierarchyRectangularNode<IDatum>) => (d.y1 - d.y0) / 2
+        )
         .attr("fill", fill);
 
       g.selectAll(".datatext")
-        .data(root.descendants().filter((d: any) => d.x1 - d.x0 > 50))
+        .data(
+          root
+            .descendants()
+            .filter(
+              (d: d3.HierarchyRectangularNode<IDatum>) => d.x1 - d.x0 > 50
+            )
+        )
         .join("text")
         .attr("class", "datatext")
         .attr("text-anchor", "middle")
-        .attr("x", (d: any) => (d.y0 + d.y1) / 4)
-        .attr("y", (d: any) => (d.x0 + d.x1) / 8)
+        .attr(
+          "x",
+          (d: d3.HierarchyRectangularNode<IDatum>) => (d.y0 + d.y1) / 4
+        )
+        .attr(
+          "y",
+          (d: d3.HierarchyRectangularNode<IDatum>) => (d.x0 + d.x1) / 8
+        )
         .attr("dy", "0.35em")
         .attr("font-size", "1em")
-        .text((d: any) => d.data.name);
+        .text((d: d3.HierarchyRectangularNode<IDatum>) => d.data.name);
     };
 
-    d3.json("./data/games.json").then((data: any) => {
-      root = d3.partition<IDatum>().size([height, width])(
-        d3
-          .hierarchy<IDatum>(data)
-          .sum((d: any) => d.popularity)
-          .sort((a: any, b: any) => b.popularity - a.popularity)
-      );
-      console.log(1);
-      console.log(root);
-      render(root);
+    d3.json<IDatum>("./data/games.json").then((data: IDatum | undefined) => {
+      if (data) {
+        root = d3.partition<IDatum>().size([height, width])(
+          d3
+            .hierarchy<IDatum>(data, (d: any) => {
+              console.log(d, "valueFn");
+              return d.children;
+            })
+            .sum((d: any) => {
+              console.log(d);
+              return d.popularity;
+            })
+            .sort((a: any, b: any) => b.popularity - a.popularity)
+        );
+
+        render(root);
+      }
     });
   });
   return (

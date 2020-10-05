@@ -8,7 +8,7 @@ interface IGamesDatum {
 
 interface IDatum {
   name: string;
-  children: IGamesDatum[];
+  children: this | IGamesDatum[];
 }
 
 const SunBurst: React.FC = () => {
@@ -93,7 +93,7 @@ const SunBurst: React.FC = () => {
           .sum((d: any) => d.popularity)
           .sort((a: any, b: any) => b.popularity - a.popularity)
       );
-
+      console.log(root);
       render(root);
     });
   });
