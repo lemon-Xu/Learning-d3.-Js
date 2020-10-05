@@ -67,7 +67,7 @@ const SunBurst: React.FC = () => {
         .attr("d", arc);
 
       g.selectAll(".datatext")
-        .data(root.descendants())
+        .data(root.descendants().filter((d: any) => d.depth !== 0))
         .join("text")
         .attr("class", "datatext")
         .attr("text-anchor", "middle")
