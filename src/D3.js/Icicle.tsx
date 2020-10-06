@@ -10,7 +10,8 @@ interface IGamesDatum {
 
 interface IDatum {
   name: string;
-  children: this[] | IGamesDatum[];
+  children?: this[];
+  popularity?: number;
 }
 
 interface IDatumSum {
@@ -95,15 +96,14 @@ const Icicle: React.FC = () => {
       if (data) {
         root = d3.partition<IDatum>().size([height, width])(
           d3
-            .hierarchy<IDatum>(data, (d: any) => {
-              console.log(d, "valueFn");
-              return d.children;
-            })
-            .sum((d: any) => {
-              console.log(d);
-              return d.popularity;
-            })
-            .sort((a: any, b: any) => b.popularity - a.popularity)
+            .hierarchy<IDatum>(data, (d: IDatum) =>
+              d.children ? d.children : null
+            )
+            .sum((d: IDatum) => (d.popularity ? d.popularity : 0))
+            .sort(
+              (a: d3.HierarchyNode<IDatum>, b: d3.HierarchyNode<IDatum>) =>
+                (b.data.popularity || 0) - (a.data.popularity || 0)
+            )
         );
 
         render(root);

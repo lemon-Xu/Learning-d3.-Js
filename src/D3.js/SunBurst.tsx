@@ -8,7 +8,8 @@ interface IGamesDatum {
 
 interface IDatum {
   name: string;
-  children: this | IGamesDatum[];
+  popularity?: number;
+  children?: this[];
 }
 
 const SunBurst: React.FC = () => {
@@ -26,7 +27,7 @@ const SunBurst: React.FC = () => {
   const svg = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    let root: d3.HierarchyNode<IDatum>;
+    let root: d3.HierarchyRectangularNode<IDatum>;
     const svgSelection = d3.select(svg.current);
     svgSelection.attr("width", width).attr("height", height);
 
@@ -56,7 +57,7 @@ const SunBurst: React.FC = () => {
 
     const render = (data: any) => {
       color = d3.scaleOrdinal(d3.schemeCategory10);
-      console.log(data[0]);
+
       g.selectAll(".datapath")
         .data<d3.HierarchyRectangularNode<IDatum>>(
           data.descendants().filter((d: any) => d.depth !== 0)
@@ -72,10 +73,10 @@ const SunBurst: React.FC = () => {
         .attr("class", "datatext")
         .attr("text-anchor", "middle")
         .attr("pointer-events", "none")
-        .attr("font-size", (d: any) =>
+        .attr("font-size", (d: d3.HierarchyRectangularNode<IDatum>) =>
           d.data.name.length < 15 ? "1em" : ".85em"
         )
-        .attr("transform", (d: any) => {
+        .attr("transform", (d: d3.HierarchyRectangularNode<IDatum>) => {
           const x = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
           const y = (d.y0 + d.y1) / 2;
           //
@@ -83,17 +84,19 @@ const SunBurst: React.FC = () => {
             x < 180 ? 0 : 180
           }) translate(0, 5)`;
         })
-        .text((d: any) => d.data.name);
+        .text((d: d3.HierarchyRectangularNode<IDatum>) => d.data.name);
     };
 
     d3.json("./data/games.json").then((data: any) => {
       root = d3.partition<IDatum>().size([2 * Math.PI, height / 1.6])(
         d3
           .hierarchy<IDatum>(data)
-          .sum((d: any) => d.popularity)
-          .sort((a: any, b: any) => b.popularity - a.popularity)
+          .sum((d: IDatum) => d.popularity || 0)
+          .sort(
+            (a: d3.HierarchyNode<IDatum>, b: d3.HierarchyNode<IDatum>) =>
+              (b.data.popularity || 0) - (a.data.popularity || 0)
+          )
       );
-      console.log(root);
       render(root);
     });
   });

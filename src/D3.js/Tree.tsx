@@ -8,7 +8,8 @@ interface IGamesDatum {
 
 interface IDatum {
   name: string;
-  children: this | IGamesDatum[];
+  children?: this;
+  popularity?: number;
 }
 
 const Tree: React.FC = () => {
