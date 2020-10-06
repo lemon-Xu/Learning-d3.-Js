@@ -9,15 +9,15 @@ import "./App.css";
 // import { SimpleLine } from "./D3.js/SimpleLine";
 // import { InteractionMap } from "./D3.js/Interaction.Map";
 // import { StackBarChart } from "./D3.js/StackBarChart.Simple";
-import { Tree } from "./D3.js/Tree";
-import { Icicle } from "./D3.js/Icicle";
-import { SunBurst } from "./D3.js/SunBurst";
+// import { Tree } from "./D3.js/Tree";
+// import { Icicle } from "./D3.js/Icicle";
+// import { SunBurst } from "./D3.js/SunBurst";
+import { Force } from "./D3.js/Force";
+
 function App() {
   return (
     <>
-      <Tree></Tree>
-      <Icicle></Icicle>
-      <SunBurst></SunBurst>
+      <Force></Force>
     </>
   );
 }
