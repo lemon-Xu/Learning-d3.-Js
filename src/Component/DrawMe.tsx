@@ -1,7 +1,5 @@
 import React, {useRef, useEffect, useReducer, useState, ReactNode, ReactElement,Reducer, createContext,useContext, Dispatch, ReducerAction} from 'react';
 import {select} from 'd3'
-import { stat } from 'fs';
-import { type } from 'os';
 
 interface IPSCanvas{
     width: number;
@@ -69,11 +67,11 @@ const Store:React.Context<{state:IState, dispatch:Dispatch<ReducerAction<Reducer
  * @param props IPSCanvas
  */
 const Canvas: React.FC<IPSCanvas> = (props: React.PropsWithChildren<IPSCanvas>)=>{
-    const canvas = useRef<SVGSVGElement>(null);
+    const svg = useRef<SVGSVGElement>(null);
     const [state, dispatch] = useReducer<Reducer<IState,IAction>>(reducer, {})
-    console.log(1)
+    const {width, height,} = props;
+    
     useEffect(()=>{
-        const {width, height,} = props;
         let {marginTop, marginRight, marginBottom, marginLeft} = props;
         marginTop = marginTop ? (marginTop > 0 ? marginTop : 0) : 0;
         marginRight = marginRight ? (marginRight > 0 ? marginRight : 0) :0
@@ -82,11 +80,27 @@ const Canvas: React.FC<IPSCanvas> = (props: React.PropsWithChildren<IPSCanvas>)=
 
         const innerWidth = width -  marginLeft - marginRight;
         const innerHeight = height - marginTop - marginBottom
+
+        const canvas = {
+            width,
+            height,
+            marginTop,
+            marginRight,
+            marginBottom,
+            marginLeft,
+            innerWidth,
+            innerHeight
+        }
+
+
+        console.log(1)
          
-        select(canvas.current).attr('width', width).attr('height',height).attr('translate', `transform(${marginLeft}, ${marginRight})`)
-        dispatch(setCanvas({width,height,marginTop,marginRight,marginBottom,marginLeft,innerWidth,innerHeight}))
-    })
-    let children:ReactNode[] = []
+        select(svg.current).attr('width', width).attr('height',height).attr('translate', `transform(${marginLeft}, ${marginRight})`)
+        if(canvas){
+            dispatch(setCanvas(canvas))
+        }
+    },[props,height,width])
+    const children:ReactNode[] = []
     if(props.children){
         React.Children.map(props.children,(c:ReactNode)=>{
             children.push(c)
@@ -94,7 +108,7 @@ const Canvas: React.FC<IPSCanvas> = (props: React.PropsWithChildren<IPSCanvas>)=
     }
     
     return (<Store.Provider value={{state,dispatch}}>
-        <svg ref={canvas}>
+        <svg ref={svg}>
             {
                children
             }
