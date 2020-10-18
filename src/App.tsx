@@ -12,12 +12,14 @@ import "./App.css";
 // import { Tree } from "./D3.js/Tree";
 // import { Icicle } from "./D3.js/Icicle";
 // import { SunBurst } from "./D3.js/SunBurst";
-import { Force } from "./D3.js/Force";
+// import { Force } from "./D3.js/Force";
+import {DrawMe} from './Component/lemon-d3'
 
 function App() {
+
   return (
     <>
-      <Force></Force>
+      <DrawMe></DrawMe>
     </>
   );
 }
