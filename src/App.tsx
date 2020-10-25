@@ -13,13 +13,13 @@ import "./App.css";
 // import { Icicle } from "./D3.js/Icicle";
 // import { SunBurst } from "./D3.js/SunBurst";
 // import { Force } from "./D3.js/Force";
-import {DrawMe} from './Component/lemon-d3'
+import {DrawMe, Demo} from './Component/lemon-d3'
 
 function App() {
 
   return (
     <>
-      <DrawMe></DrawMe>
+      <Demo></Demo>
     </>
   );
 }
